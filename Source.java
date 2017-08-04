@@ -80,7 +80,7 @@ public class Source
 				int row_num = sc.nextInt() - 1;
 				int col_num = sc.nextInt() - 1;
 
-				while(source.board.get(row_num).get(col_num)!=0 || row_num > 3 || row_num < 1 || col_num > 3 || col_num < 1){
+				while(row_num > 2 || row_num < 0 || col_num > 2 || col_num < 0 ||source.board.get(row_num).get(col_num)!=0 ){
 					System.out.println("Enter valid coordinates");
 					row_num = sc.nextInt() - 1;
 					col_num = sc.nextInt() - 1;
@@ -109,11 +109,16 @@ public class Source
 				int row_num = row_col.get(0);
 				int col_num = row_col.get(1);
 				int XorO = 0;
-				if (source.firstPlayer == 1)
+				if (source.firstPlayer == 1){
 					XorO = 2;
-				else XorO = 1;
+					System.out.println("Computer Plays O");
+				}
+				else{
+					XorO = 1;
+					System.out.println("Computer Plays X");
+				}
 				source.board.get(row_num).set(col_num,XorO);
-				System.out.println("Computer Plays");
+
 				source.print_board();
 				continue;
 			}

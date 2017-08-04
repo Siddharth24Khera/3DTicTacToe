@@ -68,17 +68,19 @@ public class Intelligence
 			return move_index;
 		}
 
+		move_index = side_move();
+		if ( move_index != -1){
+			magicSquareArray.set(move_index,true);
+			return move_index;
+		}
+		
 		move_index = corner_move();
 		if ( move_index != -1){
 			magicSquareArray.set(move_index,true);
 			return move_index;
 		}
 
-		move_index = side_move();
-		if ( move_index != -1){
-			magicSquareArray.set(move_index,true);
-			return move_index;
-		}
+
 
 		this.gameStatus = 2;
 		return move_index;
