@@ -24,7 +24,6 @@ public class Intelligence
 	}
 
 	public int play_a_move(){
-
 		int move_index;
 
 		move_index = self_win();
