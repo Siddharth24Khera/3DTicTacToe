@@ -23,32 +23,60 @@ public class Intelligence
 
 	}
 
+	public void set_magicSquareArray(int i){this.magicSquareArray.set(i,true);}
+
+	public MagicCube getMagicCube() {return magicCube;}
+
+	public void append_player_moves(int i){	this.list_of_player_moves.add(i);}
+
+	public void append_comp_moves(int i){this.list_of_comp_moves.add(i);}
+
+	public int getGameStatus(){return gameStatus;}
+
+	public ArrayList<Integer> getBoardCoordi(int index){
+		ArrayList<Integer> row_col = new ArrayList<Integer>(2);
+		for(int i=0;i<3;i++){
+			for(int j =0;j<3;j++){
+				if(magicCube.getCubeArray().get(i).get(j) == index){
+					row_col.add(i);
+					row_col.add(j);
+				}
+			}
+		}
+		return row_col;
+	}
+
 	public int play_a_move(){
 		int move_index;
 
 		move_index = self_win();
 		if ( move_index != -1 ){
 			this.gameStatus = 1;
+			magicSquareArray.set(move_index,true);
 			return move_index;
 		}
 
 		move_index = opp_win();
 		if ( move_index != -1){
+			magicSquareArray.set(move_index,true);
 			return move_index;
 		}
 
 		move_index = centre_move();
 		if ( move_index != -1){
+			magicSquareArray.set(move_index,true);
 			return move_index;
 		}
 
 		move_index = corner_move();
 		if ( move_index != -1){
+			magicSquareArray.set(move_index,true);
 			return move_index;
 		}
 
 		move_index = side_move();
 		if ( move_index != -1){
+			magicSquareArray.set(move_index,true);
 			return move_index;
 		}
 
@@ -91,7 +119,7 @@ public class Intelligence
 	}
 
 	private int centre_move(){
-		int centre_index = this.magicCube.getMagic_cube().get(1).get(1);
+		int centre_index = this.magicCube.getCubeArray().get(1).get(1);
 		if (!this.magicSquareArray.get(centre_index))
 			return centre_index;
 		return -1;
@@ -99,10 +127,10 @@ public class Intelligence
 
 	private int corner_move(){
 		ArrayList<Integer> corner_indices = new ArrayList<Integer>(4);
-		corner_indices.add(magicCube.getMagic_cube().get(0).get(0));
-		corner_indices.add(magicCube.getMagic_cube().get(0).get(2));
-		corner_indices.add(magicCube.getMagic_cube().get(2).get(2));
-		corner_indices.add(magicCube.getMagic_cube().get(2).get(0));
+		corner_indices.add(magicCube.getCubeArray().get(0).get(0));
+		corner_indices.add(magicCube.getCubeArray().get(0).get(2));
+		corner_indices.add(magicCube.getCubeArray().get(2).get(2));
+		corner_indices.add(magicCube.getCubeArray().get(2).get(0));
 		Iterator<Integer> it_corner = corner_indices.listIterator();
 		while (it_corner.hasNext()){
 			int corner_index = it_corner.next();
@@ -115,10 +143,10 @@ public class Intelligence
 
 	private int side_move(){
 		ArrayList<Integer> side_indices = new ArrayList<Integer>(4);
-		side_indices.add(magicCube.getMagic_cube().get(0).get(1));
-		side_indices.add(magicCube.getMagic_cube().get(1).get(2));
-		side_indices.add(magicCube.getMagic_cube().get(2).get(1));
-		side_indices.add(magicCube.getMagic_cube().get(1).get(0));
+		side_indices.add(magicCube.getCubeArray().get(0).get(1));
+		side_indices.add(magicCube.getCubeArray().get(1).get(2));
+		side_indices.add(magicCube.getCubeArray().get(2).get(1));
+		side_indices.add(magicCube.getCubeArray().get(1).get(0));
 		Iterator<Integer> it_side = side_indices.listIterator();
 		while (it_side.hasNext()){
 			int side_index = it_side.next();
@@ -173,7 +201,7 @@ class MagicCube{
 		this.fillSquare();
 	}
 
-	public ArrayList<ArrayList<Integer>> getMagic_cube(){
+	public ArrayList<ArrayList<Integer>> getCubeArray(){
 		return magic_cube;
 	}
 
