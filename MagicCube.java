@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
@@ -47,34 +46,36 @@ public class MagicCube{
     }
 
     public void print_cube(){
-        System.out.println("Printing the top three layers of the magic cube");
+        System.out.println("Printing the three layers of the magic cube");
+        System.out.println();
         // (i,j,k) indexing
         //i for layer ; j for row; k for column
         for(int i=0;i<order;i++){
+            System.out.println("Layer "+ (i+1));
             for(int j=0;j<order;j++){
                 for(int k=0;k<order;k++){
                     System.out.print(magic_cube.get(i).get(j).get(k)+" ");
                 }
                 System.out.println();
             }
-            System.out.println("Layer "+ (i+1));
             System.out.println();
         }
     }
 
 
     private void fillCube(){
-        int n_row = order/2, n_col = order/2, n_layer = 0;
+        int n_row = order/2, n_col = order/2, n_ht = 0;
         for(int i =0; i < Math.pow(this.order,3);i++) {
-            magic_cube.get(n_layer).get(n_row).set(n_col, i+1);
-            n_layer = adjust(order,--n_layer);
+            magic_cube.get(n_ht).get(n_row).set(n_col, i+1);
+            hash.put(i+1,new Tuple(n_ht,n_row,n_col));
+            n_ht = adjust(order,--n_ht);
             n_col = adjust(order,--n_col);
-            if(magic_cube.get(n_layer).get(n_row).get(n_col)!=0){
+            if(magic_cube.get(n_ht).get(n_row).get(n_col)!=0){
                 n_row = adjust(order,--n_row);
                 n_col = adjust(order,++n_col);
-                if (magic_cube.get(n_layer).get(n_row).get(n_col)!=0){
+                if (magic_cube.get(n_ht).get(n_row).get(n_col)!=0){
                     n_row = adjust(order,++n_row);
-                    n_layer = adjust(order, n_layer+2);
+                    n_ht = adjust(order, n_ht+2);
                 }
             }
         }
@@ -126,101 +127,32 @@ public class MagicCube{
     }//end of method
 }
 
-class Tuple{
+class Tuple {
     int i;
     int j;
     int k;
-    Tuple(){
-        i=-1;
-        j=-1;
-        k=-1;
+
+    Tuple() {
+        i = -1;
+        j = -1;
+        k = -1;
     }
-    Tuple(int i,int j,int k){
-        this.i=i;
-        this.j=j;
-        this.k=k;
+
+    Tuple(int i, int j, int k) {
+        this.i = i;
+        this.j = j;
+        this.k = k;
     }
-    public int get_x(){
+
+    public int get_x() {
         return i;
     }
-    public int get_y(){
+
+    public int get_y() {
         return j;
     }
-    public int get_z(){
+
+    public int get_z() {
         return k;
     }
-=======
-import java.io.*;
-import java.util.*;
-class MagicCube{
-	private ArrayList<ArrayList<ArrayList<Integer>>> magic_cube;
-	private int order;
-
-	public MagicCube(int order){
-		this.order = order;
-		magic_cube = new ArrayList<ArrayList<ArrayList<Integer>>>();
-		for(int i=0;i<order;i++){
-			magic_cube.add(new ArrayList<ArrayList<Integer>>());
-			for(int j=0;j<order;j++){
-				magic_cube.get(i).add(new ArrayList<Integer>());
-				for(int k=0;k<order;k++){
-					magic_cube.get(i).get(j).add(0);
-				}
-			}
-		}
-		this.fillCube();
-	}
-
-	public ArrayList<ArrayList<ArrayList<Integer>>> getMagic_cube(){
-		return magic_cube;
-	}
-
-	public int getOrder(){
-		return order;
-	}
-
-	public void print_cube(){
-		System.out.println("Printing the top three layers of the magic cube");
-		for(int k=0;k<order;k++){
-			for(int i=0;i<order;i++){
-				for(int j=0;j<order;j++){
-					System.out.print(magic_cube.get(k).get(i).get(j)+" ");
-				}
-				System.out.println();
-			}
-			System.out.println();
-		}	
-	}
-
-	private void fillCube(){
-		int n_row = order/2, n_col = order/2, n_ht = 0;
-		for(int i =0; i < Math.pow(this.order,3);i++) {
-			magic_cube.get(n_ht).get(n_row).set(n_col, i+1);
-			n_ht = adjust(order,--n_ht);
-			n_col = adjust(order,--n_col);
-			if(magic_cube.get(n_ht).get(n_row).get(n_col)!=0){
-				n_row = adjust(order,--n_row);
-				n_col = adjust(order,++n_col);
-				if (magic_cube.get(n_ht).get(n_row).get(n_col)!=0){
-					n_row = adjust(order,++n_row);
-					n_ht = adjust(order, n_ht+2);
-				}
-			}
-		}
-	}
-
-	private int adjust(int order, int num){
-		while(num<0)
-			num+=order;
-		while(num>order-1)
-			num-=order;
-		return num;
-	}
-
-	public static void main(String args[]){
-		MagicCube magicCube = new MagicCube(3);
-		magicCube.print_cube();
-	}
-
->>>>>>> f56a23ef760d514d8104f3b8fcabd3e712da022f
 }
