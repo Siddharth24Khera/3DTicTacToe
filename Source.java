@@ -12,14 +12,6 @@ public class Source
 		intel = new Intelligence();
 		firstPlayer = 0;
 
-		board = new ArrayList<ArrayList<Integer>>(3);
-		for(int i = 0; i < 3; i++)  {
-			board.add(new ArrayList<Integer>(3));
-			for(int j = 0; j < 3; j++){
-				board.get(i).add(0);
-			}
-		}
-
 		board = new ArrayList<ArrayList<ArrayList<Integer>>>(3);
 		for(int i=0;i<3;i++){
 			board.add(new ArrayList<ArrayList<Integer>>(3));
@@ -37,28 +29,37 @@ public class Source
 	}
 
 	private void print_board(){
-		System.out.println("------");
-		for(int i = 0; i < 3; i++)  {
-			for(int j = 0; j < 3; j++){
-				int num = this.board.get(i).get(j);
-				if(num == 1)
-					System.out.print("X");
-				else if(num == 2)
-					System.out.print("O");
-				else System.out.print(" ");
-
-				if(j==0 || j ==1)
-					System.out.print("|");
-			}
-
+		for(int i=0;i<3;i++){
 			System.out.println();
+			System.out.println("------");
+			for(int j = 0; j < 3; j++)  {
+				for(int k = 0; k < 3; k++){
+					int num = this.board.get(i).get(j).get(k);
+					if(num == 1)
+						System.out.print("X");
+					else if(num == 2)
+						System.out.print("O");
+					else System.out.print(" ");
+
+					if(k==0 || k ==1)
+						System.out.print("|");
+				}
+
+				System.out.println();
+			}
+			System.out.println("------");
+
 		}
-		System.out.println("------");
+
 	}
 
 	public static void main (String args [])
 	{
 		Source source = new Source();
+		source.getIntel().getMagicCube().print_cube();
+		System.out.println(source.getIntel().getMagicCube().get_not_sum_good_list());
+		System.out.println(source.getIntel().getMagicCube().getSum_bad_list());
+		System.out.println(source.getIntel().getMagicCube().getSum_good_list());
 		System.out.println("Welcome to 3DTicTacToe");
 		System.out.println("Enter 1 for playing first or 2 for playing second");
 		Scanner sc = new Scanner(System.in);
@@ -72,7 +73,7 @@ public class Source
 
 		source.print_board();
 		int move_count = 0;
-		while(move_count < 10){
+		while(move_count < 28){
 			move_count += 1;
 
 			if (source.getIntel().getGameStatus() == 1){
@@ -80,19 +81,22 @@ public class Source
 				return;
 			}
 
-			if (source.getIntel().getGameStatus() == 2 || move_count == 10){
+			if (source.getIntel().getGameStatus() == 2 || move_count == 28){
 				System.out.println("Game Tied");
 				return;
 			}
 
 			if((source.firstPlayer == 1 && move_count % 2 ==1) || (source.firstPlayer == 0 && move_count % 2 ==0)){
 				// Human Turn
-				System.out.println("Your Turn: Enter row and column separated by space");
+				System.out.println("");
+				System.out.println("Your Turn: Enter layer, row and column separated by space");
+				int lay_num = sc.nextInt() - 1;
 				int row_num = sc.nextInt() - 1;
 				int col_num = sc.nextInt() - 1;
 
-				while(row_num > 2 || row_num < 0 || col_num > 2 || col_num < 0 ||source.board.get(row_num).get(col_num)!=0 ){
+				while(lay_num>2||lay_num<0||row_num>2||row_num<0||col_num>2||col_num<0||source.board.get(lay_num).get(row_num).get(col_num)!=0){
 					System.out.println("Enter valid coordinates");
+					lay_num = sc.nextInt() - 1;
 					row_num = sc.nextInt() - 1;
 					col_num = sc.nextInt() - 1;
 				}
@@ -101,9 +105,9 @@ public class Source
 				if (source.firstPlayer == 1)
 					XorO = 1;
 				else XorO = 2;
-				source.board.get(row_num).set(col_num,XorO);
+				source.board.get(lay_num).get(row_num).set(col_num,XorO);
 
-				int index_bool_list = source.getIntel().getMagicCube().getMagic_cube().get(row_num).get(col_num);
+				int index_bool_list = source.getIntel().getMagicCube().getMagic_cube().get(lay_num).get(row_num).get(col_num);
 				source.getIntel().append_player_moves(index_bool_list);
 				source.getIntel().set_magicSquareArray(index_bool_list);
 				source.print_board();
@@ -115,10 +119,11 @@ public class Source
 
 				int move_index = source.getIntel().play_a_move();
 				source.getIntel().append_comp_moves(move_index);
-				ArrayList<Integer> row_col = source.getIntel().getBoardCoordinates(move_index);
+				ArrayList<Integer> layer_row_col = source.getIntel().getBoardCoordinates(move_index);
 
-				int row_num = row_col.get(0);
-				int col_num = row_col.get(1);
+				int lay_num = layer_row_col.get(0);
+				int row_num = layer_row_col.get(1);
+				int col_num = layer_row_col.get(2);
 				int XorO = 0;
 				if (source.firstPlayer == 1){
 					XorO = 2;
@@ -128,7 +133,7 @@ public class Source
 					XorO = 1;
 					System.out.println("Computer Plays X");
 				}
-				source.board.get(row_num).set(col_num,XorO);
+				source.board.get(lay_num).get(row_num).set(col_num,XorO);
 
 				source.print_board();
 				continue;
