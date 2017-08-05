@@ -6,7 +6,7 @@ public class Source
 {
 	private Intelligence intel;
 	private int firstPlayer; // 0 for computer 1 for human
-	private ArrayList<ArrayList<Integer>> board; // 0 for unoccupied; 1 for X; 2 for O
+	private ArrayList<ArrayList<ArrayList<Integer>>> board; // 0 for unoccupied; 1 for X; 2 for O
 
 	public Source(){
 		intel = new Intelligence();
@@ -17,6 +17,17 @@ public class Source
 			board.add(new ArrayList<Integer>(3));
 			for(int j = 0; j < 3; j++){
 				board.get(i).add(0);
+			}
+		}
+
+		board = new ArrayList<ArrayList<ArrayList<Integer>>>(3);
+		for(int i=0;i<3;i++){
+			board.add(new ArrayList<ArrayList<Integer>>(3));
+			for(int j=0;j<3;j++){
+				board.get(i).add(new ArrayList<Integer>(3));
+				for(int k=0;k<3;k++){
+					board.get(i).get(j).add(0);
+				}
 			}
 		}
 	}
@@ -92,7 +103,7 @@ public class Source
 				else XorO = 2;
 				source.board.get(row_num).set(col_num,XorO);
 
-				int index_bool_list = source.getIntel().getMagicCube().getCubeArray().get(row_num).get(col_num);
+				int index_bool_list = source.getIntel().getMagicCube().getMagic_cube().get(row_num).get(col_num);
 				source.getIntel().append_player_moves(index_bool_list);
 				source.getIntel().set_magicSquareArray(index_bool_list);
 				source.print_board();
