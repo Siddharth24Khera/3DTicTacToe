@@ -53,62 +53,75 @@ public class Intelligence
 	public int play_a_move(){
 		int move_index;
 
-		move_index = self_win();
+		move_index = check_win(0);
 		if ( move_index != -1 ){
+			System.out.println("Computer's Winning Move");
 			this.gameStatus = 1;
 			magicSquareArray.set(move_index,true);
 			return move_index;
 		}
 
-		move_index = opp_win();
+		move_index = check_win(1);
 		if ( move_index != -1){
+			System.out.println("Computer's Blocking Move");
 			magicSquareArray.set(move_index,true);
 			return move_index;
 		}
 
 		move_index = cube_centre_move();
 		if ( move_index != -1){
+			System.out.println("Computer's Cube Centre Move");
 			magicSquareArray.set(move_index,true);
 			return move_index;
 		}
 
 		move_index = face_centre_move();
 		if ( move_index != -1){
-			magicSquareArray.set(move_index,true);
-			return move_index;
-		}
-
-		move_index = edge_centre_move();
-		if ( move_index != -1){
+			System.out.println("Computer's Face Centre Move");
 			magicSquareArray.set(move_index,true);
 			return move_index;
 		}
 
 		move_index = cube_corner_move();
 		if ( move_index != -1){
+			System.out.println("Computer's Cube Corner Move");
+
 			magicSquareArray.set(move_index,true);
 			return move_index;
 		}
+
+		move_index = edge_centre_move();
+		if ( move_index != -1){
+			System.out.println("Computer's Edge Centre Move");
+			magicSquareArray.set(move_index,true);
+			return move_index;
+		}
+
+
 
 		this.gameStatus = 2;
 		return move_index;
 	}
 
-	private int self_win(){
-		ArrayList<ArrayList<Integer>> list_of_comp_sums = get_sum_tuples_list(0);
-
+	private int check_win(int compOrHum){
+		// 0 for comp 1 for Human
+		ArrayList<ArrayList<Integer>> list_of_sums = get_sum_tuples_list(compOrHum);
+		//System.out.println(list_of_sums);
 		ArrayList<Integer> falseArrayList = new ArrayList<Integer>(2);
 		falseArrayList.add(-1);falseArrayList.add(-1);
-		if (isEqual_ArrayList(list_of_comp_sums.get(0),falseArrayList))
+		if (isEqual_ArrayList(list_of_sums.get(0),falseArrayList)){
 			return -1;
+		}
 
-		Iterator<ArrayList<Integer>> it_comp = list_of_comp_sums.listIterator();
-		while ((it_comp.hasNext())){
-			ArrayList<Integer> sum_tuple = it_comp.next();
+
+		Iterator<ArrayList<Integer>> it = list_of_sums.listIterator();
+		while ((it.hasNext())){
+			ArrayList<Integer> sum_tuple = it.next();
 
 			// handle not sum good list
 			int not_sum_good_index = get_not_42_good_list_index(sum_tuple);
 			if(not_sum_good_index != -1){
+				//System.out.println("Problem detected");
 				return not_sum_good_index;
 			}
 
@@ -130,41 +143,7 @@ public class Intelligence
 			return diff;
 		}
 		return -1;
-	}
 
-	private int opp_win(){
-		ArrayList<ArrayList<Integer>> list_of_player_sums = get_sum_tuples_list(1);
-
-		ArrayList<Integer> falseArrayList = new ArrayList<Integer>(2);
-		falseArrayList.add(-1);falseArrayList.add(-1);
-		if (isEqual_ArrayList(list_of_player_sums.get(0),falseArrayList))
-			return -1;
-
-		Iterator<ArrayList<Integer>> it_player = list_of_player_sums.listIterator();
-		while ((it_player.hasNext())){
-			ArrayList<Integer> sum_tuple = it_player.next();
-			// handle not sum good list
-			int not_sum_good_index = get_not_42_good_list_index(sum_tuple);
-			if(not_sum_good_index != -1){
-				return not_sum_good_index;
-			}
-
-			int diff = 42 - sum_tuple.get(0) - sum_tuple.get(1);
-			if (diff <= 0 || diff > 27 ){
-				continue;
-			}
-			ArrayList<Integer> triplet = new ArrayList<Integer>(3);
-			triplet.add(sum_tuple.get(0));triplet.add(sum_tuple.get(1));triplet.add(diff);
-			Collections.sort(triplet);
-			for ( ArrayList<Integer> bad_tuple_42 : magicCube.getSum_bad_list()){
-				if(isEqual_ArrayList(bad_tuple_42,triplet))
-					return -1;
-			}
-			if (this.magicSquareArray.get(diff))
-				continue;
-			return diff;
-		}
-		return -1;
 	}
 
 	private int cube_centre_move(){
@@ -234,7 +213,8 @@ public class Intelligence
 		return  -1;
 	}
 
-	private ArrayList<ArrayList<Integer>> get_sum_tuples_list(int i){
+	private ArrayList<ArrayList<Integer>> get_sum_tuples_list(int i)
+	{
 		// i = 0 for comp and i = 1 for player
 		ArrayList<Integer> input_list;
 		ArrayList<ArrayList<Integer>> output_list = new ArrayList<ArrayList<Integer>>();
@@ -271,14 +251,9 @@ public class Intelligence
 		if((l1 == null && l2 != null) || (l1 != null && l2 == null))
 			return false;
 
-		if(l1.size()!=l2.size())
+		if(l1.size() != l2.size())
 			return false;
-		for(int i=0;i<l1.size();i++)
-		{
-			if(l1.get(i) != l2.get(i))
-				return false;
-		}
-		return true;
+		return l1.equals(l2);
 	}
 
 	private int conver_to_base3(int num) {
@@ -298,12 +273,10 @@ public class Intelligence
 			ArrayList<Integer> current_triplet = full_list_of_triplets.get(i);
 			int first = current_triplet.indexOf(doublet.get(0));
 			int second = current_triplet.indexOf(doublet.get(1));
-			if((first==-1) || (second==-1))	return -1;
+			if((first==-1) || (second==-1))	continue;
 			int missing_index  = 3 - (first + second);
 			return current_triplet.get(missing_index);
 		}
 		return -1;
 	}
 }
-
-
