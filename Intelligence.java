@@ -1,6 +1,7 @@
 import java.io.*;
 import java.util.*;
 import java.lang.Math;
+import java.util.Collections;
 
 public class Intelligence
 {
@@ -12,7 +13,7 @@ public class Intelligence
 
 	public Intelligence(){
 		magicCube = new MagicCube(3);
-		int total_elem_num = (int)Math.pow(magicCube.getOrder(),2) + 1;
+		int total_elem_num = (int)Math.pow(magicCube.getOrder(),3) + 1;
 		magicSquareArray = new ArrayList<Boolean>(total_elem_num);
 		for (int i = 0; i < total_elem_num; i++) {
 		  magicSquareArray.add(false);
@@ -33,17 +34,20 @@ public class Intelligence
 
 	public int getGameStatus(){return gameStatus;}
 
-	public ArrayList<Integer> getBoardCoordi(int index){
-		ArrayList<Integer> row_col = new ArrayList<Integer>(2);
+	public ArrayList<Integer> getBoardCoordinates(int index){
+		ArrayList<Integer> layer_row_col = new ArrayList<Integer>(2);
 		for(int i=0;i<3;i++){
 			for(int j =0;j<3;j++){
-				if(magicCube.getCubeArray().get(i).get(j) == index){
-					row_col.add(i);
-					row_col.add(j);
+				for(int k=0;k<3;k++){
+					if(magicCube.getCubeArray().get(i).get(j).get(k) == index){
+						layer_row_col.add(i);
+						layer_row_col.add(j);
+						layer_row_col.add(k);
+					}
 				}
 			}
 		}
-		return row_col;
+		return layer_row_col;
 	}
 
 	public int play_a_move(){
@@ -62,19 +66,25 @@ public class Intelligence
 			return move_index;
 		}
 
-		move_index = centre_move();
+		move_index = cube_centre_move();
 		if ( move_index != -1){
 			magicSquareArray.set(move_index,true);
 			return move_index;
 		}
 
-		move_index = side_move();
+		move_index = face_centre_move();
 		if ( move_index != -1){
 			magicSquareArray.set(move_index,true);
 			return move_index;
 		}
 
-		move_index = corner_move();
+		move_index = edge_centre_move();
+		if ( move_index != -1){
+			magicSquareArray.set(move_index,true);
+			return move_index;
+		}
+
+		move_index = cube_corner_move();
 		if ( move_index != -1){
 			magicSquareArray.set(move_index,true);
 			return move_index;
@@ -85,15 +95,37 @@ public class Intelligence
 	}
 
 	private int self_win(){
-		ArrayList<Integer> list_of_comp_sums = get_sum_list(0);
-		if (list_of_comp_sums.get(0) == -1)
+		ArrayList<ArrayList<Integer>> list_of_comp_sums = get_sum_tuples_list(0);
+
+		ArrayList<Integer> falseArrayList = new ArrayList<Integer>(2);
+		falseArrayList.add(-1);falseArrayList.add(-1);
+		if (isEqual_ArrayList(list_of_comp_sums.get(0),falseArrayList))
 			return -1;
-		Iterator<Integer> it_comp = list_of_comp_sums.listIterator();
+
+		Iterator<ArrayList<Integer>> it_comp = list_of_comp_sums.listIterator();
 		while ((it_comp.hasNext())){
-			int diff = 15 - (it_comp.next());
-			if (diff <= 0 || diff > 9 ){
+			ArrayList<Integer> sum_tuple = it_comp.next();
+
+			// handle not sum good list
+			int not_sum_good_index = get_not_42_good_list_index(sum_tuple);
+			if(not_sum_good_index != -1){
+				return not_sum_good_index;
+			}
+
+
+			int diff = 15 - sum_tuple.get(0) - sum_tuple.get(1);
+
+			if (diff <= 0 || diff > 27 ){
 				continue;
 			}
+			ArrayList<Integer> triplet = new ArrayList<Integer>(3);
+			triplet.add(sum_tuple.get(0));triplet.add(sum_tuple.get(1));triplet.add(diff);
+			Collections.sort(triplet);
+			for ( ArrayList<Integer> bad_tuple_42 : magicCube.getSum_bad_list()){
+				if(isEqual_ArrayList(bad_tuple_42,triplet))
+					return -1;
+			}
+
 			if (this.magicSquareArray.get(diff))
 				continue;
 			return diff;
@@ -102,14 +134,28 @@ public class Intelligence
 	}
 
 	private int opp_win(){
-		ArrayList<Integer> list_of_player_sums = get_sum_list(1);
-		if (list_of_player_sums.get(0) == -1)
+		ArrayList<ArrayList<Integer>> list_of_player_sums = get_sum_tuples_list(1);
+
+		ArrayList<Integer> falseArrayList = new ArrayList<Integer>(2);
+		falseArrayList.add(-1);falseArrayList.add(-1);
+		if (isEqual_ArrayList(list_of_player_sums.get(0),falseArrayList))
 			return -1;
-		Iterator<Integer> it_player = list_of_player_sums.listIterator();
+
+		Iterator<ArrayList<Integer>> it_player = list_of_player_sums.listIterator();
 		while ((it_player.hasNext())){
-			int diff = 15 - (it_player.next());
+			ArrayList<Integer> sum_tuple = it_player.next();
+			// handle not sum good list
+
+			int diff = 15 - sum_tuple.get(0) - sum_tuple.get(1);
 			if (diff <= 0 || diff > 9 ){
 				continue;
+			}
+			ArrayList<Integer> triplet = new ArrayList<Integer>(3);
+			triplet.add(sum_tuple.get(0));triplet.add(sum_tuple.get(1));triplet.add(diff);
+			Collections.sort(triplet);
+			for ( ArrayList<Integer> bad_tuple_42 : magicCube.getSum_bad_list()){
+				if(isEqual_ArrayList(bad_tuple_42,triplet))
+					return -1;
 			}
 			if (this.magicSquareArray.get(diff))
 				continue;
@@ -118,19 +164,63 @@ public class Intelligence
 		return -1;
 	}
 
-	private int centre_move(){
-		int centre_index = this.magicCube.getCubeArray().get(1).get(1);
+	private int cube_centre_move(){
+		int centre_index = this.magicCube.getCubeArray().get(1).get(1).get(1);
 		if (!this.magicSquareArray.get(centre_index))
 			return centre_index;
 		return -1;
 	}
 
-	private int corner_move(){
+	private int face_centre_move(){
+		ArrayList<Integer> face_centres = new ArrayList<Integer>(6)
+		face_centres.add(this.magicCube.getCubeArray().get(0).get(1).get(1));
+		face_centres.add(this.magicCube.getCubeArray().get(2).get(1).get(1));
+		face_centres.add(this.magicCube.getCubeArray().get(1).get(0).get(1));
+		face_centres.add(this.magicCube.getCubeArray().get(1).get(2).get(1));
+		face_centres.add(this.magicCube.getCubeArray().get(1).get(1).get(0));
+		face_centres.add(this.magicCube.getCubeArray().get(1).get(1).get(2));
+		Iterator<Integer> it_face_centre = face_centres.listIterator();
+		while (it_face_centre.hasNext()){
+			int face_centre_index = it_face_centre.next();
+			if (this.magicSquareArray.get(face_centre_index))
+				continue;
+			return face_centre_index;
+		}
+		return -1;
+	}
+
+	private int edge_centre_move(){
+		ArrayList<Integer> edge_center_indices = new ArrayList<Integer>(12);
+		for(int i = 1; i<27;i=i+2){
+			if(i == 13)
+				continue;
+			int ternary = conver_to_base3(i);
+			int layer = ternary/100;
+			int row = (ternary % 100) / 10;
+			int col = (ternary %10) / 10;
+			edge_center_indices.add(magicCube.getCubeArray().get(layer).get(row).get(col));
+		}
+		Iterator<Integer> it_edge_center = edge_center_indices.listIterator();
+		while (it_edge_center.hasNext()){
+			int edge_center = it_edge_center.next();
+			if (this.magicSquareArray.get(edge_center))
+				continue;
+			return edge_center;
+		}
+		return -1;
+	}
+
+	private int cube_corner_move(){
 		ArrayList<Integer> corner_indices = new ArrayList<Integer>(4);
-		corner_indices.add(magicCube.getCubeArray().get(0).get(0));
-		corner_indices.add(magicCube.getCubeArray().get(0).get(2));
-		corner_indices.add(magicCube.getCubeArray().get(2).get(2));
-		corner_indices.add(magicCube.getCubeArray().get(2).get(0));
+		corner_indices.add(magicCube.getCubeArray().get(0).get(0).get(0));
+		corner_indices.add(magicCube.getCubeArray().get(0).get(0).get(2));
+		corner_indices.add(magicCube.getCubeArray().get(0).get(2).get(0));
+		corner_indices.add(magicCube.getCubeArray().get(0).get(2).get(2));
+		corner_indices.add(magicCube.getCubeArray().get(2).get(0).get(0));
+		corner_indices.add(magicCube.getCubeArray().get(2).get(0).get(2));
+		corner_indices.add(magicCube.getCubeArray().get(2).get(2).get(0));
+		corner_indices.add(magicCube.getCubeArray().get(2).get(2).get(2));
+
 		Iterator<Integer> it_corner = corner_indices.listIterator();
 		while (it_corner.hasNext()){
 			int corner_index = it_corner.next();
@@ -141,26 +231,10 @@ public class Intelligence
 		return  -1;
 	}
 
-	private int side_move(){
-		ArrayList<Integer> side_indices = new ArrayList<Integer>(4);
-		side_indices.add(magicCube.getCubeArray().get(0).get(1));
-		side_indices.add(magicCube.getCubeArray().get(1).get(2));
-		side_indices.add(magicCube.getCubeArray().get(2).get(1));
-		side_indices.add(magicCube.getCubeArray().get(1).get(0));
-		Iterator<Integer> it_side = side_indices.listIterator();
-		while (it_side.hasNext()){
-			int side_index = it_side.next();
-			if (this.magicSquareArray.get(side_index))
-				continue;
-			return side_index;
-		}
-		return -1;
-	}
-
-	private ArrayList<Integer> get_sum_list(int i){
+	private ArrayList<ArrayList<Integer>> get_sum_tuples_list(int i){
 		// i = 0 for comp and i = 1 for player
 		ArrayList<Integer> input_list;
-		ArrayList<Integer> output_list = new ArrayList<Integer>();
+		ArrayList<ArrayList<Integer>> output_list = new ArrayList<ArrayList<Integer>>();
 		if(i == 0)
 			input_list = this.list_of_comp_moves;
 		else
@@ -168,7 +242,9 @@ public class Intelligence
 
 		int input_size = input_list.size();
 		if (input_size == 1 || input_size == 0){
-			output_list.add(-1);
+			ArrayList<Integer> falseArrayList = new ArrayList<Integer>(2);
+			falseArrayList.add(-1);falseArrayList.add(-1);
+			output_list.add(falseArrayList);
 			return output_list;
 		}
 
@@ -178,74 +254,125 @@ public class Intelligence
 			int num = input_it.next();
 			if(num == last_elem)
 				break;
-			output_list.add(num + last_elem);
+			ArrayList<Integer> doublet = new ArrayList<Integer>(2);
+			doublet.add(num); doublet.add(last_elem);
+			output_list.add(doublet);
 		}
 		return output_list;
+	}
+
+	private boolean isEqual_ArrayList(ArrayList<Integer> l1, ArrayList<Integer> l2){
+		//null checking
+		if(l1==null && l2==null)
+			return true;
+		if((l1 == null && l2 != null) || (l1 != null && l2 == null))
+			return false;
+
+		if(l1.size()!=l2.size())
+			return false;
+		for(int i=0;i<l1.size();i++)
+		{
+			if(l1.get(i) != l2.get(i))
+				return false;
+		}
+		return true;
+	}
+
+	private int conver_to_base3(int num) {
+		int ret = 0, factor = 1;
+		while (num > 0) {
+			ret += num % 3 * factor;
+			num /= 3;
+			factor *= 10;
+		}
+		return ret;
+	}
+
+	private int get_not_42_good_list_index(ArrayList<Integer> doublet){
+		ArrayList<ArrayList<Integer>> full_list_of_triplet = magicCube.get_not_sum_good_list();
+		// Return third index ; if none exist return -1
+		return -1;
 	}
 }
 
 class MagicCube{
-	private ArrayList<ArrayList<Integer>> magic_cube;
+	private ArrayList<ArrayList<ArrayList<Integer>>> magic_cube;
+	private ArrayList<ArrayList<Integer>> sum_good_list;
+	private ArrayList<ArrayList<Integer>> sum_bad_list;
+	private ArrayList<ArrayList<Integer>> not_sum_good_list;
 	private int order;
 
 	public MagicCube(int order){
-
 		this.order = order;
-		magic_cube = new ArrayList<ArrayList<Integer>>(order);
-		for(int i = 0; i < order; i++)  {
-			magic_cube.add(new ArrayList<Integer>());
-			for(int j = 0; j < order; j++){
-				magic_cube.get(i).add(0);
+		magic_cube = new ArrayList<ArrayList<ArrayList<Integer>>>(3);
+		for(int i=0;i<order;i++){
+			magic_cube.add(new ArrayList<ArrayList<Integer>>(3));
+			for(int j=0;j<order;j++){
+				magic_cube.get(i).add(new ArrayList<Integer>(3));
+				for(int k=0;k<order;k++){
+					magic_cube.get(i).get(j).add(0);
+				}
 			}
 		}
-		this.fillSquare();
+		this.fillCube();
 	}
 
-	public ArrayList<ArrayList<Integer>> getCubeArray(){
+	public ArrayList<ArrayList<ArrayList<Integer>>> getMagic_cube(){
 		return magic_cube;
 	}
+
+	public ArrayList<ArrayList<Integer>> getSum_good_list(){return sum_good_list;}
+
+	public ArrayList<ArrayList<Integer>> getSum_bad_list(){return sum_bad_list;}
+
+	public ArrayList<ArrayList<Integer>> get_not_sum_good_list(){return not_sum_good_list;}
 
 	public int getOrder(){
 		return order;
 	}
 
 	public void print_cube(){
-		for(int i = 0;i<3;i++){
-			for(int j=0;j<3;j++){
-				System.out.print(magic_cube.get(i).get(j));
-				System.out.print(' ');
+		System.out.println("Printing the top three layers of the magic cube");
+		// (i,j,k) indexing
+		//i for layer ; j for row; k for column
+		for(int i=0;i<order;i++){
+			for(int j=0;j<order;j++){
+				for(int k=0;k<order;k++){
+					System.out.print(magic_cube.get(i).get(j).get(k)+" ");
+				}
+				System.out.println();
 			}
 			System.out.println();
 		}
 	}
 
-	private void fillSquare(){
-		int n_row = 0,n_col = 0;
+	public ArrayList<ArrayList<ArrayList<Integer>>> getCubeArray(){
+		return magic_cube;
+	}
 
-		for(int i =1; i < Math.pow(this.order,2)+1;i++) {
-			if (i == 1) {
-				n_row = order / 2;
-				n_col = order - 1;
-				this.magic_cube.get(n_row).set(n_col, i);
-				continue;
-			}
-
-			n_row = (n_row - 1) % order;
-			if ( n_row < 0 )
-				n_row += order;
-			n_col = (n_col + 1) % order;
-
-			if (this.magic_cube.get(n_row).get(n_col) == 0) {
-				this.magic_cube.get(n_row).set(n_col, i);
-			}
-			else{
-				n_row = (n_row + 1) % order;
-				n_col = (n_col - 2) % order;
-				if(n_col<0)
-					n_col += order;
-				this.magic_cube.get(n_row).set(n_col, i);
+	private void fillCube(){
+		int n_row = order/2, n_col = order/2, n_layer = 0;
+		for(int i =0; i < Math.pow(this.order,3);i++) {
+			magic_cube.get(n_layer).get(n_row).set(n_col, i+1);
+			n_layer = adjust(order,--n_layer);
+			n_col = adjust(order,--n_col);
+			if(magic_cube.get(n_layer).get(n_row).get(n_col)!=0){
+				n_row = adjust(order,--n_row);
+				n_col = adjust(order,++n_col);
+				if (magic_cube.get(n_layer).get(n_row).get(n_col)!=0){
+					n_row = adjust(order,++n_row);
+					n_layer = adjust(order, n_layer+2);
+				}
 			}
 		}
-
 	}
+
+	private int adjust(int order, int num){
+		while(num<0)
+			num+=order;
+		while(num>order-1)
+			num-=order;
+		return num;
+	}
+
 }

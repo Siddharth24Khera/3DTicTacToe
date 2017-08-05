@@ -104,7 +104,7 @@ public class Source
 
 				int move_index = source.getIntel().play_a_move();
 				source.getIntel().append_comp_moves(move_index);
-				ArrayList<Integer> row_col = source.getIntel().getBoardCoordi(move_index);
+				ArrayList<Integer> row_col = source.getIntel().getBoardCoordinates(move_index);
 
 				int row_num = row_col.get(0);
 				int col_num = row_col.get(1);
