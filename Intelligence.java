@@ -8,6 +8,8 @@ public class Intelligence
 	private ArrayList<Boolean> magicSquareArray;
 	private ArrayList<Integer> list_of_player_moves;
 	private ArrayList<Integer> list_of_comp_moves;
+	private ArrayList<Integer> list_of_possible_loss;
+	private ArrayList<Integer> list_of_possible_wins;
 	private MagicCube magicCube;
 	private int gameStatus; // 0 for 'in process' and 1 for win and 2 for tie
 
@@ -20,6 +22,7 @@ public class Intelligence
 		}
 		list_of_player_moves = new ArrayList<Integer>();
 		list_of_comp_moves = new ArrayList<Integer>();
+		list_of_possible_loss = new ArrayList<Integer>();
 		gameStatus = 0;
 
 	}
@@ -28,11 +31,21 @@ public class Intelligence
 
 	public MagicCube getMagicCube() {return magicCube;}
 
+	public ArrayList<Integer> getList_of_possible_loss() {return list_of_possible_loss;	}
+
+	public ArrayList<Integer> getList_of_possible_wins() {return list_of_possible_wins;	}
+
+	public ArrayList<Boolean> getMagicSquareArray() {return magicSquareArray; }
+
 	public void append_player_moves(int i){	this.list_of_player_moves.add(i);}
 
 	public void append_comp_moves(int i){this.list_of_comp_moves.add(i);}
 
 	public int getGameStatus(){return gameStatus;}
+
+	public void setGameStatus(int gameStatus) {
+		this.gameStatus = gameStatus;
+	}
 
 	public ArrayList<Integer> getBoardCoordinates(int index){
 		ArrayList<Integer> layer_row_col = new ArrayList<Integer>(2);
@@ -52,11 +65,11 @@ public class Intelligence
 
 	public int play_a_move(){
 		int move_index;
-
 		move_index = check_win(0);
 		if ( move_index != -1 ){
 			System.out.println("Computer's Winning Move");
 			this.gameStatus = 1;
+			int updateLossList = check_win(2);
 			magicSquareArray.set(move_index,true);
 			return move_index;
 		}
@@ -97,14 +110,20 @@ public class Intelligence
 			return move_index;
 		}
 
-
-
 		this.gameStatus = 2;
 		return move_index;
 	}
 
 	private int check_win(int compOrHum){
 		// 0 for comp 1 for Human
+		boolean isCalledFromWin = false;
+		if (compOrHum == 2){
+			isCalledFromWin = true;
+			compOrHum = 1;
+		}
+
+
+
 		ArrayList<ArrayList<Integer>> list_of_sums = get_sum_tuples_list(compOrHum);
 		//System.out.println(list_of_sums);
 		ArrayList<Integer> falseArrayList = new ArrayList<Integer>(2);
@@ -121,8 +140,24 @@ public class Intelligence
 			// handle not sum good list
 			int not_sum_good_index = get_not_42_good_list_index(sum_tuple);
 			if(not_sum_good_index != -1){
-				//System.out.println("Problem detected");
-				return not_sum_good_index;
+				if (this.magicSquareArray.get(not_sum_good_index))
+					continue;
+				if(compOrHum == 1) {
+					list_of_possible_loss.add(not_sum_good_index);
+					continue;
+				}
+				else{
+					System.out.println();
+					System.out.println();
+					System.out.println("Computer wins the following line:");
+					ArrayList<Integer> boardCoord1 = getBoardCoordinates(sum_tuple.get(0));
+					ArrayList<Integer> boardCoord2 = getBoardCoordinates(sum_tuple.get(1));
+					ArrayList<Integer> boardCoord3 = getBoardCoordinates(not_sum_good_index);
+					System.out.print("["+(boardCoord1.get(0)+1)+','+(boardCoord1.get(1)+1)+','+(boardCoord1.get(2)+1)+"] ");
+					System.out.print("["+(boardCoord2.get(0)+1)+','+(boardCoord2.get(1)+1)+','+(boardCoord2.get(2)+1)+"] ");
+					System.out.println("["+(boardCoord3.get(0)+1)+','+(boardCoord3.get(1)+1)+','+(boardCoord3.get(2)+1)+"] ");
+					return not_sum_good_index;
+				}
 			}
 
 			int diff = 42 - sum_tuple.get(0) - sum_tuple.get(1);
@@ -133,15 +168,43 @@ public class Intelligence
 			ArrayList<Integer> triplet = new ArrayList<Integer>(3);
 			triplet.add(sum_tuple.get(0));triplet.add(sum_tuple.get(1));triplet.add(diff);
 			Collections.sort(triplet);
+			boolean flag = false;
 			for ( ArrayList<Integer> bad_tuple_42 : magicCube.getSum_bad_list()){
-				if(isEqual_ArrayList(bad_tuple_42,triplet))
-					return -1;
+				if(isEqual_ArrayList(bad_tuple_42,triplet)) {
+					flag= true;
+				}
+			}
+			if(flag){
+				continue;
 			}
 
 			if (this.magicSquareArray.get(diff))
 				continue;
-			return diff;
+			if(compOrHum == 1) {
+				list_of_possible_loss.add(diff);
+
+			}
+			else {
+				System.out.println();
+				System.out.println();
+				System.out.println("Computer wins the following line:");
+				ArrayList<Integer> boardCoord1 = getBoardCoordinates(sum_tuple.get(0));
+				ArrayList<Integer> boardCoord2 = getBoardCoordinates(sum_tuple.get(1));
+				ArrayList<Integer> boardCoord3 = getBoardCoordinates(diff);
+				System.out.print("["+(boardCoord1.get(0)+1)+','+(boardCoord1.get(1)+1)+','+(boardCoord1.get(2)+1)+"] ");
+				System.out.print("["+(boardCoord2.get(0)+1)+','+(boardCoord2.get(1)+1)+','+(boardCoord2.get(2)+1)+"] ");
+				System.out.println("["+(boardCoord3.get(0)+1)+','+(boardCoord3.get(1)+1)+','+(boardCoord3.get(2)+1)+"] ");
+				return diff;
+			}
+
 		}
+
+		if(compOrHum == 1 && list_of_possible_loss.size() != 0 && !isCalledFromWin){
+			int blockIndex =  list_of_possible_loss.get(0);
+			list_of_possible_loss.remove(0);
+			return blockIndex;
+		}
+
 		return -1;
 
 	}
@@ -156,10 +219,10 @@ public class Intelligence
 	private int face_centre_move(){
 		ArrayList<Integer> face_centres = new ArrayList<Integer>(6);
 		face_centres.add(this.magicCube.getMagic_cube().get(0).get(1).get(1));
-		face_centres.add(this.magicCube.getMagic_cube().get(2).get(1).get(1));
-		face_centres.add(this.magicCube.getMagic_cube().get(1).get(0).get(1));
 		face_centres.add(this.magicCube.getMagic_cube().get(1).get(2).get(1));
 		face_centres.add(this.magicCube.getMagic_cube().get(1).get(1).get(0));
+		face_centres.add(this.magicCube.getMagic_cube().get(2).get(1).get(1));
+		face_centres.add(this.magicCube.getMagic_cube().get(1).get(0).get(1));
 		face_centres.add(this.magicCube.getMagic_cube().get(1).get(1).get(2));
 		Iterator<Integer> it_face_centre = face_centres.listIterator();
 		while (it_face_centre.hasNext()){
