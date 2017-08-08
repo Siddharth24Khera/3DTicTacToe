@@ -131,27 +131,20 @@ class Tuple {
     int i;
     int j;
     int k;
-
     Tuple() {
-        i = -1;
-        j = -1;
-        k = -1;
+        i = -1; j = -1; k = -1;
     }
-
     Tuple(int i, int j, int k) {
         this.i = i;
         this.j = j;
         this.k = k;
     }
-
     public int get_x() {
         return i;
     }
-
     public int get_y() {
         return j;
     }
-
     public int get_z() {
         return k;
     }
