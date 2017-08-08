@@ -46,10 +46,7 @@ public class MagicCube{
     }
 
     public void print_cube(){
-        System.out.println("Printing the three layers of the magic cube");
-        System.out.println();
-        // (i,j,k) indexing
-        //i for layer ; j for row; k for column
+        System.out.println("Printing the top three layers of the magic cube\n");
         for(int i=0;i<order;i++){
             System.out.println("Layer "+ (i+1));
             for(int j=0;j<order;j++){
@@ -60,6 +57,48 @@ public class MagicCube{
             }
             System.out.println();
         }
+
+        System.out.println("Printing the left three layers of the magic cube\n");
+        for(int k=0;k<order;k++){
+            System.out.println("Layer "+ (k+1));
+            for(int j=0;j<order;j++){
+                for(int i=0;i<order;i++){
+                    System.out.print(magic_cube.get(j).get(i).get(k)+" ");
+                }
+                System.out.println();
+            }
+            System.out.println();
+        }
+
+        System.out.println("Printing the front three layers of the magic cube\n");
+        for(int k=0;k<order;k++){
+            System.out.println("Layer "+ (k+1));
+            for(int j=0;j<order;j++){
+                for(int i=0;i<order;i++){
+                    System.out.print(magic_cube.get(j).get(2-k).get(i)+" ");
+                }
+                System.out.println();
+            }
+            System.out.println();
+        }
+
+        System.out.println("Printing the diagonals of the magic cube\n");
+        System.out.println("Diagonal 1");
+        for(int i=0;i<order;i++){
+            for(int j=0;j<order;j++){
+                System.out.print(magic_cube.get(i).get(j).get(j)+" ");
+            }
+            System.out.println();
+        }
+
+        System.out.println("\nDiagonal 2");
+        for(int i=0;i<order;i++){
+            for(int j=0;j<order;j++){
+                System.out.print(magic_cube.get(i).get(2-j).get(j)+" ");
+            }
+            System.out.println();
+        }
+
     }
 
 
@@ -117,10 +156,10 @@ public class MagicCube{
                     Tuple coord3 = hash.get(k);
                     boolean b = (check_collinearity(coord1,coord2,coord3));
                     if((i+j+k)==42){
-                        if(b)	sum_good_list.add(al);
-                        else 	sum_bad_list.add(al);
+                        if(b)   sum_good_list.add(al);
+                        else    sum_bad_list.add(al);
                     }
-                    else if(b)	not_sum_good_list.add(al); //end of if-else construct
+                    else if(b)  not_sum_good_list.add(al); //end of if-else construct
                 }//end of k-loop
             }//end of j-loop
         } //end of i-loop
