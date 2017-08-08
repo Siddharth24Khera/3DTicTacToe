@@ -224,6 +224,7 @@ public class Intelligence
 		face_centres.add(this.magicCube.getMagic_cube().get(2).get(1).get(1));
 		face_centres.add(this.magicCube.getMagic_cube().get(1).get(0).get(1));
 		face_centres.add(this.magicCube.getMagic_cube().get(1).get(1).get(2));
+		Collections.shuffle(face_centres);
 		Iterator<Integer> it_face_centre = face_centres.listIterator();
 		while (it_face_centre.hasNext()){
 			int face_centre_index = it_face_centre.next();
@@ -245,6 +246,7 @@ public class Intelligence
 			int col = (ternary %10) / 10;
 			edge_center_indices.add(magicCube.getMagic_cube().get(layer).get(row).get(col));
 		}
+		Collections.shuffle(edge_center_indices);
 		Iterator<Integer> it_edge_center = edge_center_indices.listIterator();
 		while (it_edge_center.hasNext()){
 			int edge_center = it_edge_center.next();
@@ -265,7 +267,7 @@ public class Intelligence
 		corner_indices.add(magicCube.getMagic_cube().get(2).get(0).get(2));
 		corner_indices.add(magicCube.getMagic_cube().get(2).get(2).get(0));
 		corner_indices.add(magicCube.getMagic_cube().get(2).get(2).get(2));
-
+		Collections.shuffle(corner_indices);
 		Iterator<Integer> it_corner = corner_indices.listIterator();
 		while (it_corner.hasNext()){
 			int corner_index = it_corner.next();
