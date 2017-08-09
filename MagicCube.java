@@ -45,6 +45,23 @@ public class MagicCube{
         return order;
     }
 
+//    public void print_cube(){
+//        System.out.println("Printing the three layers of the magic cube");
+//        System.out.println();
+//        // (i,j,k) indexing
+//        //i for layer ; j for row; k for column
+//        for(int i=0;i<order;i++){
+//            System.out.println("Layer "+ (i+1));
+//            for(int j=0;j<order;j++){
+//                for(int k=0;k<order;k++){
+//                    System.out.print(magic_cube.get(i).get(j).get(k)+" ");
+//                }
+//                System.out.println();
+//            }
+//            System.out.println();
+//        }
+//    }
+
     public void print_cube(){
         System.out.println("Printing the top three layers of the magic cube\n");
         for(int i=0;i<order;i++){
@@ -98,6 +115,7 @@ public class MagicCube{
             }
             System.out.println();
         }
+        System.out.println();
 
     }
 
@@ -156,10 +174,10 @@ public class MagicCube{
                     Tuple coord3 = hash.get(k);
                     boolean b = (check_collinearity(coord1,coord2,coord3));
                     if((i+j+k)==42){
-                        if(b)   sum_good_list.add(al);
-                        else    sum_bad_list.add(al);
+                        if(b)	sum_good_list.add(al);
+                        else 	sum_bad_list.add(al);
                     }
-                    else if(b)  not_sum_good_list.add(al); //end of if-else construct
+                    else if(b)	not_sum_good_list.add(al); //end of if-else construct
                 }//end of k-loop
             }//end of j-loop
         } //end of i-loop
@@ -170,20 +188,27 @@ class Tuple {
     int i;
     int j;
     int k;
+
     Tuple() {
-        i = -1; j = -1; k = -1;
+        i = -1;
+        j = -1;
+        k = -1;
     }
+
     Tuple(int i, int j, int k) {
         this.i = i;
         this.j = j;
         this.k = k;
     }
+
     public int get_x() {
         return i;
     }
+
     public int get_y() {
         return j;
     }
+
     public int get_z() {
         return k;
     }
