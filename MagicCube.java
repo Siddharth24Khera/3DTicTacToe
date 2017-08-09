@@ -3,7 +3,7 @@ import java.util.Collections;
 import java.util.Hashtable;
 
 public class MagicCube{
-    private ArrayList<ArrayList<ArrayList<Integer>>> magic_cube;
+    private ArrayList<ArrayList<ArrayList<Integer>>> magic_cube; //represented as 3x3x3 array list of integers
     private ArrayList<ArrayList<Integer>> sum_good_list;
     private ArrayList<ArrayList<Integer>> sum_bad_list;
     private ArrayList<ArrayList<Integer>> not_sum_good_list;
@@ -24,9 +24,9 @@ public class MagicCube{
                 }
             }
         }
-        this.fillCube();
-        sum_good_list = new ArrayList<ArrayList<Integer>>();
-        sum_bad_list = new ArrayList<ArrayList<Integer>>();
+        this.fillCube(); //fills the cube
+        sum_good_list = new ArrayList<ArrayList<Integer>>(); //generates a list of all tuples with sum 42, and are collinear
+        sum_bad_list = new ArrayList<ArrayList<Integer>>(); //generates a list of all tuples which are not collinear with sum 42
         not_sum_good_list = new ArrayList<ArrayList<Integer>>();
         generateLists();
     }
