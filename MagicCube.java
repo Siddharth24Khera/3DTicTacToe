@@ -3,13 +3,13 @@ import java.util.Collections;
 import java.util.Hashtable;
 
 public class MagicCube{
+    /*This class deals with the magic cube methods like creating a magic cube, generating the lists of numbers, checking collinearity*/
     private ArrayList<ArrayList<ArrayList<Integer>>> magic_cube; //represented as 3x3x3 array list of integers
     private ArrayList<ArrayList<Integer>> sum_good_list;
     private ArrayList<ArrayList<Integer>> sum_bad_list;
     private ArrayList<ArrayList<Integer>> not_sum_good_list;
     private int order;
-    Hashtable<Integer,Tuple> hash;
-
+    Hashtable<Integer,Tuple> hash; //maintained a hash table to get the coordinates and corresponding number on the cube in O(1) time
 
     public MagicCube(int order){
         hash = new Hashtable<Integer,Tuple>();
@@ -20,7 +20,7 @@ public class MagicCube{
             for(int j=0;j<order;j++){
                 magic_cube.get(i).add(new ArrayList<Integer>(3));
                 for(int k=0;k<order;k++){
-                    magic_cube.get(i).get(j).add(0);
+                    magic_cube.get(i).get(j).add(0);  //initializing a 3d arraylist with zeros
                 }
             }
         }
@@ -28,7 +28,7 @@ public class MagicCube{
         sum_good_list = new ArrayList<ArrayList<Integer>>(); //generates a list of all tuples with sum 42, and are collinear
         sum_bad_list = new ArrayList<ArrayList<Integer>>(); //generates a list of all tuples which are not collinear with sum 42
         not_sum_good_list = new ArrayList<ArrayList<Integer>>();//list with collinear tuples and sum is not 42
-        generateLists();
+        generateLists(); //generates all the above lists
     }
 
     public ArrayList<ArrayList<ArrayList<Integer>>> getMagic_cube(){
@@ -152,7 +152,6 @@ public class MagicCube{
     }
     
     //geenrate all the three lists required
-    //maintained a hash table to get the coordinates and corresponding number on the cube in O(1) time
     private void generateLists(){
         for(int i=1;i<26;i++){
             for(int j=i+1;j<27;j++){
